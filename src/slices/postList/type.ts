@@ -6,6 +6,7 @@ export interface InitialState {
   postListByChannelId: Post[];
   postListByUserId: Post[];
   postListByMyId: Post[];
+  fullPosts: Post[];
   status: StatusType;
 }
 

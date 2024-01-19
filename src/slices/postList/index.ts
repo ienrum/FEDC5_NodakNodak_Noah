@@ -10,11 +10,14 @@ import {
 import { initialPost } from '@/slices/initialState';
 import { Post } from '@/types/APIResponseTypes';
 
+export const LIMIT = 3;
+
 const initialState: InitialState = {
-  posts: [initialPost],
+  posts: [],
   postListByChannelId: [initialPost],
   postListByUserId: [initialPost],
   postListByMyId: [initialPost],
+  fullPosts: [],
   status: 'idle',
 };
 
@@ -40,16 +43,21 @@ const postSlice = createSlice({
     builder.addCase(
       getFullPostList.fulfilled,
       (state, action: PayloadAction<Post[]>) => {
-        state.posts = action.payload;
+        if (
+          action.payload[0] &&
+          state.fullPosts.find((post) => post._id === action.payload[0]._id)
+        )
+          return;
+        if (state.fullPosts.length === 1) {
+          state.fullPosts = action.payload;
+          return;
+        }
+        state.fullPosts.push(...action.payload);
       },
     );
-    builder.addCase(
-      getPostListByMyId.fulfilled,
-      (state, action: PayloadAction<Post[]>) => {
-        state.postListByMyId = action.payload;
-      },
-    );
-
+    builder.addCase(getPostListByMyId.fulfilled, (state, action) => {
+      state.postListByMyId = action.payload;
+    });
     builder.addMatcher(
       isAnyOf(
         getPostListByChannelId.pending,
@@ -58,9 +66,6 @@ const postSlice = createSlice({
       ),
       (state) => {
         state.status = 'loading';
-        state.postListByChannelId = [initialPost];
-        state.postListByUserId = [initialPost];
-        state.posts = [initialPost];
       },
     );
     builder.addMatcher(

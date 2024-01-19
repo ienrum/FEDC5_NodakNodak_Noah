@@ -6,13 +6,17 @@ import {
   GetPostsByChannelIdParams,
   GetPostsByUserIdParams,
 } from '@/slices/postList/type';
+import { Post } from '@/types/APIResponseTypes';
 
-export const getPostListByChannelId = createAsyncThunk(
+export const getPostListByChannelId = createAsyncThunk<
+  Post[],
+  GetPostsByChannelIdParams
+>(
   `${SLICE_NAME.POST_LIST}/getPostListByChannelId`,
-  async ({ channelId, offset, limit }: GetPostsByChannelIdParams) => {
+  async ({ channelId, offset, limit }) => {
     const queries = paginationCalculator(offset, limit);
 
-    const { data } = await axiosInstance.get(
+    const { data } = await axiosInstance.get<Post[]>(
       `posts/channel/${channelId}/${queries}`,
     );
 
@@ -20,12 +24,15 @@ export const getPostListByChannelId = createAsyncThunk(
   },
 );
 
-export const getPostListByUserId = createAsyncThunk(
+export const getPostListByUserId = createAsyncThunk<
+  Post[],
+  GetPostsByUserIdParams
+>(
   `${SLICE_NAME.POST_LIST}/getPostListByUserId`,
   async ({ userId, offset, limit }: GetPostsByUserIdParams) => {
     const queries = paginationCalculator(offset, limit);
 
-    const { data } = await axiosInstance.get(
+    const { data } = await axiosInstance.get<Post[]>(
       `posts/author/${userId}/${queries}`,
     );
 
@@ -41,23 +48,25 @@ const paginationCalculator = (offset?: number, limit?: number) => {
   return `?offset=${offset}&limit=${limit}`;
 };
 
-export const getFullPostList = createAsyncThunk(
-  `${SLICE_NAME.POST_LIST}/getFullPostList`,
-  async () => {
-    const { data } = await axiosInstance.get('/posts');
+export const getFullPostList = createAsyncThunk<
+  Post[],
+  { offset: number; limit: number }
+>(`${SLICE_NAME.POST_LIST}/getFullPostList`, async ({ offset, limit }) => {
+  const queries = paginationCalculator(offset, limit);
 
-    return data;
-  },
-);
+  const { data } = await axiosInstance.get<Post[]>(`posts/${queries}`);
 
-export const getPostListByMyId = createAsyncThunk(
-  `${SLICE_NAME.POST_LIST}/getPostListByMyId`,
-  async () => {
-    const {
-      data: { _id: userId },
-    } = await axiosInstance.get('auth-user');
-    const { data } = await axiosInstance.get(`posts/author/${userId}/`);
+  return data;
+});
 
-    return data;
-  },
-);
+export const getPostListByMyId = createAsyncThunk<
+  Post[],
+  { offset: number; limit: number }
+>(`${SLICE_NAME.POST_LIST}/getPostListByMyId`, async () => {
+  const {
+    data: { _id: userId },
+  } = await axiosInstance.get('auth-user');
+  const { data } = await axiosInstance.get<Post[]>(`posts/author/${userId}/`);
+
+  return data;
+});
