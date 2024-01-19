@@ -62,7 +62,13 @@ const PostCard = ({
         <img
           width='280px'
           height='146px'
-          src={image ? image : '/DefaultImage.webp'}
+          src={
+            image
+              ? image
+                  .replace(/\.(bmp|gif|tiff|png|jpeg|jpg)$/, '.webp')
+                  .replace(/\/upload\//, '/upload/w_300/')
+              : '/DefaultImage.webp'
+          }
           onClick={handleDetailClick}
           style={{ cursor: 'pointer' }}
           alt={postId}
