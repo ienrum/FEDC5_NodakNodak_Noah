@@ -120,7 +120,7 @@ const NotificationCardBell = () => {
 
   useEffect(() => {
     if (!token) return;
-    dispatch(getPostListByMyId());
+    dispatch(getPostListByMyId({}));
     dispatch(getNotificationArray());
   }, [dispatch, token]);
 

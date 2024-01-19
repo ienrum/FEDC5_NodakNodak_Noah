@@ -61,12 +61,15 @@ export const getFullPostList = createAsyncThunk<
 
 export const getPostListByMyId = createAsyncThunk<
   Post[],
-  { offset: number; limit: number }
->(`${SLICE_NAME.POST_LIST}/getPostListByMyId`, async () => {
+  { offset?: number; limit?: number }
+>(`${SLICE_NAME.POST_LIST}/getPostListByMyId`, async ({ offset, limit }) => {
+  const queries = paginationCalculator(offset, limit);
   const {
     data: { _id: userId },
   } = await axiosInstance.get('auth-user');
-  const { data } = await axiosInstance.get<Post[]>(`posts/author/${userId}/`);
+  const { data } = await axiosInstance.get<Post[]>(
+    `posts/author/${userId}/${queries}`,
+  );
 
   return data;
 });

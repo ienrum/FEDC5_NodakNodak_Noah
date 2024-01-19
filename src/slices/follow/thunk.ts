@@ -31,7 +31,7 @@ export const follow = createAsyncThunk(
       postId: null,
     };
 
-    dispatch(getPostListByMyId());
+    dispatch(getPostListByMyId({}));
     dispatch(
       createNotification({
         notificationData,
@@ -64,7 +64,7 @@ export const unfollow = createAsyncThunk(
         id: followId,
       },
     });
-    dispatch(getPostListByMyId());
+    dispatch(getPostListByMyId({}));
 
     return data;
   },
