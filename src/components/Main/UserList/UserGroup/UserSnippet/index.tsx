@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { UserSnippetBox } from '@/components/Main/style';
 import { Avatar, OnLineBadge } from '@/components/common';
-import { UserSnippetProps } from '@/components/Main/UserList/UserSnippet/type';
+import { UserSnippetProps } from '@/components/Main/UserList/UserGroup/UserSnippet/type';
 
 const UserSnippet = ({
   isOnline,

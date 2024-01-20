@@ -1,19 +1,15 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
-  FlexWrapper,
+  ButtonWrapper,
   PostSnippetBox,
-  ContentBox,
 } from '@/components/Main/PostList/PostCard/style';
-import { UserSnippetBox } from '@/components/Main/style';
-import { Button, Card, Text, Avatar } from '@/components/common';
+import { Button, Card } from '@/components/common';
 import { PostCardProps } from '@/components/Main/PostList/PostCard/type';
-import {
-  useSelectedChannel,
-  useSelectedChannelLoading,
-} from '@/hooks/useSelectedChannel';
-import { useSelectedUser } from '@/hooks/useSelectedUser';
-import theme from '@/styles/theme';
+import { useSelectedChannel } from '@/hooks/useSelectedChannel';
+import ContentInfo from '@/components/Main/PostList/PostCard/ContentInfo';
+import UserInfo from '@/components/Main/PostList/PostCard/UserInfo';
+import { resizeImage } from '@/utils/resizeImage';
 
 const PostCard = ({
   image,
@@ -24,36 +20,27 @@ const PostCard = ({
 }: PostCardProps) => {
   const { fullName, _id: userId, image: avatar } = author;
 
-  const currentUser = useSelectedUser();
-  const location = useLocation();
-
   const parsedTitle = JSON.parse(title).title;
-  const isUserPage = location.pathname.startsWith('/user');
-  const name = isUserPage ? currentUser?.fullName : fullName;
 
-  const count = comments
-    .filter((comment) => {
-      const parsedComment = JSON.parse(comment.comment);
+  const voteCount = comments.filter((comment) => {
+    const parsedComment = JSON.parse(comment.comment);
 
-      return parsedComment.type === 'vote';
-    })
-    .length.toString();
+    return parsedComment.type === 'vote';
+  }).length;
 
   const channel = useSelectedChannel();
-  const channelLoading = useSelectedChannelLoading();
-
   const navigate = useNavigate();
 
-  const handleDetailClick = () => {
+  const handleSeeUserInfo = () => {
+    navigate(`/user/${userId}`);
+  };
+
+  const handleSeeDetail = () => {
     navigate(`/detail/${channel?._id}/${postId}`);
   };
 
-  const handleDetailResultClick = () => {
+  const handleSeeResult = () => {
     navigate(`/detail/${channel?._id}/${postId}/result`);
-  };
-
-  const handleUserClick = () => {
-    navigate(`/user/${userId}`);
   };
 
   return (
@@ -62,65 +49,22 @@ const PostCard = ({
         <img
           width='280px'
           height='146px'
-          src={
-            image
-              ? image
-                  .replace(/\.(bmp|gif|tiff|png|jpeg|jpg)$/, '.webp')
-                  .replace(/\/upload\//, '/upload/w_300/')
-              : '/DefaultImage.webp'
-          }
-          onClick={handleDetailClick}
+          src={image ? resizeImage(image, 280) : '/DefaultImage.webp'}
+          onClick={handleSeeDetail}
           style={{ cursor: 'pointer' }}
           alt={postId}
         />
-        <ContentBox>
-          <Text
-            tagType='p'
-            fontType='body2'
-            colorType='black'
-            style={{
-              overflow: 'hidden',
-              textOverflow: ' ellipsis',
-              whiteSpace: 'nowrap',
-              width: '260px',
-            }}>
-            {parsedTitle}
-          </Text>
-          <Text tagType='span' fontType='caption' colorType='black'>
-            {'총 '}
-          </Text>
-          <Text
-            tagType='span'
-            fontType='caption'
-            colorType='primary'
-            colorNumber={theme.isDark ? '200' : '400'}>
-            {count}
-          </Text>
-          <Text tagType='span' fontType='caption' colorType='black'>
-            명 투표
-          </Text>
-        </ContentBox>
-        <UserSnippetBox onClick={handleUserClick}>
-          <Avatar size='mini' src={avatar} alt={name} />
-          <Text tagType='span' fontType='caption' colorType='black'>
-            {name ? name : 'loading...'}
-          </Text>
-        </UserSnippetBox>
+        <ContentInfo title={parsedTitle} voteCount={voteCount} />
+        <UserInfo name={fullName} avatar={avatar} onClick={handleSeeUserInfo} />
       </PostSnippetBox>
-      <FlexWrapper>
-        <Button
-          styleType='primary'
-          event={channelLoading ? 'disabled' : 'enabled'}
-          onClick={handleDetailClick}>
+      <ButtonWrapper>
+        <Button styleType='primary' onClick={handleSeeDetail}>
           자세히 보기
         </Button>
-        <Button
-          styleType='ghost'
-          event={channelLoading ? 'disabled' : 'enabled'}
-          onClick={handleDetailResultClick}>
+        <Button styleType='ghost' onClick={handleSeeResult}>
           결과 보기
         </Button>
-      </FlexWrapper>
+      </ButtonWrapper>
     </Card>
   );
 };

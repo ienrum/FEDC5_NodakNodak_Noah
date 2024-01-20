@@ -1,29 +1,43 @@
-import { Card, ScrollBar } from '@/components/common';
-import useGetUserList from '@/components/Main/hooks/useGetUsers';
-import UserSnippet from '@/components/Main/UserList/UserSnippet';
-import { RenderUserSnippets } from '@/components/Main/UserList/type';
+import { useEffect } from 'react';
+
+import { Card, ScrollBar, Text } from '@/components/common';
 import UserGroup from '@/components/Main/UserList/UserGroup';
+import {
+  useSelectedMyInfo,
+  useSelectedMyInfoLoading,
+} from '@/hooks/useSelectedMyInfo';
+import { useDispatch } from '@/store';
+import {
+  useSelectedUserList,
+  useSelectedUserListLoading,
+} from '@/hooks/useSelectedUserList';
+import { getMyInfo } from '@/slices/user/thunk';
+import { getUserList } from '@/slices/userList/thunk';
+import useInterval from '@/hooks/useInterval';
 
 const UserList = () => {
-  const { userSnippetList } = useGetUserList();
+  const dispatch = useDispatch();
+  const myInfo = useSelectedMyInfo();
+  const userList = useSelectedUserList();
 
-  const onlineUsers = userSnippetList.filter((user) => user.isOnline);
-  const offlineUsers = userSnippetList.filter((user) => !user.isOnline);
+  const isLoadingUserList = useSelectedUserListLoading();
+  const isLoadingMyInfo = useSelectedMyInfoLoading();
 
-  const renderUserSnippets: RenderUserSnippets = (users, title) => (
-    <UserGroup title={title}>
-      {users.map(({ fullName, image, isFollowing, isOnline, _id }) => (
-        <UserSnippet
-          text={fullName}
-          image={image}
-          isFollowing={isFollowing}
-          isOnline={isOnline}
-          userId={_id}
-          key={_id}
-        />
-      ))}
-    </UserGroup>
-  );
+  const isLoading = isLoadingUserList || isLoadingMyInfo;
+
+  useEffect(() => {
+    dispatch(getUserList());
+    const token = localStorage.getItem('auth-token');
+    if (!token) return;
+    dispatch(getMyInfo());
+  }, [dispatch]);
+
+  useInterval(() => {
+    dispatch(getUserList());
+  }, 60000);
+
+  const onlineUsers = userList.filter((user) => user.isOnline);
+  const offlineUsers = userList.filter((user) => !user.isOnline);
 
   return (
     <Card
@@ -32,8 +46,20 @@ const UserList = () => {
       shadowType='medium'
       style={{ marginTop: '96px' }}>
       <ScrollBar>
-        {renderUserSnippets(onlineUsers, `online - ${onlineUsers.length}`)}
-        {renderUserSnippets(offlineUsers, `offline - ${offlineUsers.length}`)}
+        {isLoading ? (
+          <Text tagType='span' fontType='body2'>
+            로딩중...
+          </Text>
+        ) : (
+          <>
+            <UserGroup title='온라인' userArray={onlineUsers} myInfo={myInfo} />
+            <UserGroup
+              title='오프라인'
+              userArray={offlineUsers}
+              myInfo={myInfo}
+            />
+          </>
+        )}
       </ScrollBar>
     </Card>
   );

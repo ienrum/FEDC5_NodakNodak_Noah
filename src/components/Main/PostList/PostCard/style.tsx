@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const FlexWrapper = styled.div`
+export const ButtonWrapper = styled.div`
   display: flex;
   justify-content: space-around;
 `;
@@ -24,5 +24,3 @@ export const PostSnippetBox = styled.div`
     padding: 2px 12px;
   }
 `;
-
-export const ContentBox = styled.div``;
