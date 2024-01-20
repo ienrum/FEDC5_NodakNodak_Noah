@@ -10,11 +10,9 @@ import {
 import { initialPost } from '@/slices/initialState';
 import { Post } from '@/types/APIResponseTypes';
 
-export const LIMIT = 3;
-
 const initialState: InitialState = {
   posts: [],
-  postListByChannelId: [initialPost],
+  postListByChannelId: { '': [] },
   postListByUserId: [initialPost],
   postListByMyId: [initialPost],
   fullPosts: [],
@@ -26,13 +24,10 @@ const postSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(
-      getPostListByChannelId.fulfilled,
-      (state, action: PayloadAction<Post[]>) => {
-        state.posts = action.payload;
-        state.postListByChannelId = action.payload;
-      },
-    );
+    builder.addCase(getPostListByChannelId.fulfilled, (state, action) => {
+      state.posts = action.payload[1];
+      state.postListByChannelId[action.payload[0]] = action.payload[1];
+    });
     builder.addCase(
       getPostListByUserId.fulfilled,
       (state, action: PayloadAction<Post[]>) => {

@@ -3,7 +3,7 @@ import { StatusType } from '@/slices/type';
 
 export interface InitialState {
   posts: Post[];
-  postListByChannelId: Post[];
+  postListByChannelId: { [channelId: string]: Post[] };
   postListByUserId: Post[];
   postListByMyId: Post[];
   fullPosts: Post[];

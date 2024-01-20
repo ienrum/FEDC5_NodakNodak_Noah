@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { InitialState, SearchedPost } from '@/slices/searchedData/type';
-import { searchAllData, searchUserData } from '@/slices/searchedData/thunk';
+import { searchPostData, searchUserData } from '@/slices/searchedData/thunk';
 import { SLICE_NAME } from '@/slices/constants';
 import { initialSearchedPost, initialUser } from '@/slices/initialState';
 import { User } from '@/types/APIResponseTypes';
@@ -17,7 +17,7 @@ const searchedDataSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(
-      searchAllData.fulfilled,
+      searchPostData.fulfilled,
       (state, action: PayloadAction<SearchedPost[]>) => {
         state.postData = action.payload;
       },
@@ -30,7 +30,7 @@ const searchedDataSlice = createSlice({
     );
 
     builder.addMatcher(
-      isAnyOf(searchAllData.pending, searchUserData.pending),
+      isAnyOf(searchPostData.pending, searchUserData.pending),
       (state) => {
         state.status = 'loading';
         state.postData = [initialSearchedPost];
@@ -39,9 +39,9 @@ const searchedDataSlice = createSlice({
     );
     builder.addMatcher(
       isAnyOf(
-        searchAllData.fulfilled,
+        searchPostData.fulfilled,
         searchUserData.fulfilled,
-        searchAllData.rejected,
+        searchPostData.rejected,
         searchUserData.rejected,
       ),
       (state) => {

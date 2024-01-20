@@ -20,9 +20,8 @@ import {
   NotificationList,
   NotificationHeader,
 } from '@/components/layout/Header/NotificationCardBell/style';
-import UserSnippet from '@/components/Main/UserList/UserSnippet';
+import UserSnippet from '@/components/Main/UserList/UserGroup/UserSnippet';
 import { Badge, ScrollBar, Text, Button } from '@/components/common';
-import UserGroup from '@/components/Main/UserList/UserGroup';
 import { NotificationData } from '@/components/layout/Header/NotificationCardBell/type';
 
 const NotificationCardBell = () => {
@@ -149,7 +148,7 @@ const NotificationCardBell = () => {
               </Button>
             </NotificationHeader>
             <NotificationList>
-              <UserGroup>
+              <>
                 {notificationsArray.length === 0 && (
                   <Text tagType='span' fontType='h3'>
                     {'알림이 없습니다.'}
@@ -175,7 +174,7 @@ const NotificationCardBell = () => {
                     );
                   },
                 )}
-              </UserGroup>
+              </>
             </NotificationList>
           </ScrollBar>
         </NotificationContainer>

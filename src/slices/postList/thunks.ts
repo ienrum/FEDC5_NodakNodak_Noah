@@ -9,7 +9,7 @@ import {
 import { Post } from '@/types/APIResponseTypes';
 
 export const getPostListByChannelId = createAsyncThunk<
-  Post[],
+  [string, Post[]],
   GetPostsByChannelIdParams
 >(
   `${SLICE_NAME.POST_LIST}/getPostListByChannelId`,
@@ -20,7 +20,7 @@ export const getPostListByChannelId = createAsyncThunk<
       `posts/channel/${channelId}/${queries}`,
     );
 
-    return data;
+    return [channelId, data];
   },
 );
 
@@ -48,16 +48,14 @@ const paginationCalculator = (offset?: number, limit?: number) => {
   return `?offset=${offset}&limit=${limit}`;
 };
 
-export const getFullPostList = createAsyncThunk<
-  Post[],
-  { offset: number; limit: number }
->(`${SLICE_NAME.POST_LIST}/getFullPostList`, async ({ offset, limit }) => {
-  const queries = paginationCalculator(offset, limit);
+export const getFullPostList = createAsyncThunk<Post[]>(
+  `${SLICE_NAME.POST_LIST}/getFullPostList`,
+  async () => {
+    const { data } = await axiosInstance.get<Post[]>(`posts/`);
 
-  const { data } = await axiosInstance.get<Post[]>(`posts/${queries}`);
-
-  return data;
-});
+    return data;
+  },
+);
 
 export const getPostListByMyId = createAsyncThunk<
   Post[],
